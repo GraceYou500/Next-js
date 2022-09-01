@@ -47,7 +47,17 @@ export async function getStaticProps() {
     props: {
       meetups: DUMMY_MEETUPS,
     },
+    revalidate: 10, // seconds the server will wait for every generate.
   };
 }
+
+// export async function getServerSideProps(context) {
+//   const req = context.req; // get the request object
+//   const res = context.res; //  the response object will be send back
+//   // fetch data from API
+//   return {
+//     props: { meetups: DUMMY_MEETUPS },
+//   };
+// } // all code in getServerSideProps will run on the server, not on client side.
 
 export default HomePage;
