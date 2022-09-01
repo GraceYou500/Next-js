@@ -1,5 +1,5 @@
 // domain.com/
-
+// import { useEffect, useState } from 'react';
 import MeetupList from '../components/meetups/MeetupList';
 
 const DUMMY_MEETUPS = [
@@ -29,8 +29,25 @@ const DUMMY_MEETUPS = [
   },
 ];
 
-function HomePage() {
-  return <MeetupList meetups={DUMMY_MEETUPS} />;
+function HomePage(props) {
+  // No longer need useState and useEffect, using getStaticProps to get data.
+  // const [loadedMeetups, setLoadedMeetups] = useState([]);
+
+  // useEffect(() => {
+  //   // send Http request and fetch data
+  //   setLoadedMeetups(DUMMY_MEETUPS);
+  // }, []); // only run when the component first rended, and never after.
+
+  return <MeetupList meetups={props.meetups} />;
+}
+
+export async function getStaticProps() {
+  // fetch data from API
+  return {
+    props: {
+      meetups: DUMMY_MEETUPS,
+    },
+  };
 }
 
 export default HomePage;
