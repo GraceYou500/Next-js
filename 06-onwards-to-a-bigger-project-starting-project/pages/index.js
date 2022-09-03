@@ -1,33 +1,35 @@
 // domain.com/
 // import { useEffect, useState } from 'react';
+import { MongoClient } from 'mongodb';
+
 import MeetupList from '../components/meetups/MeetupList';
 
-const DUMMY_MEETUPS = [
-  {
-    id: 'm1',
-    title: 'A First Meetup',
-    image:
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Stadtbild_M%C3%BCnchen.jpg/1280px-Stadtbild_M%C3%BCnchen.jpg',
-    address: ' 5, 1234 Street, City',
-    description: 'The First Meetup!',
-  },
-  {
-    id: 'm2',
-    title: 'A Second Meetup',
-    image:
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Stadtbild_M%C3%BCnchen.jpg/1280px-Stadtbild_M%C3%BCnchen.jpg',
-    address: ' 6, 2222 Street, Sydney',
-    description: 'The Second Meetup!',
-  },
-  {
-    id: 'm3',
-    title: 'A Third Meetup',
-    image:
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Stadtbild_M%C3%BCnchen.jpg/1280px-Stadtbild_M%C3%BCnchen.jpg',
-    address: ' 7, 3333 Street, Mel',
-    description: 'The Third Meetup!',
-  },
-];
+// const DUMMY_MEETUPS = [
+//   {
+//     id: 'm1',
+//     title: 'A First Meetup',
+//     image:
+//       'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Stadtbild_M%C3%BCnchen.jpg/1280px-Stadtbild_M%C3%BCnchen.jpg',
+//     address: ' 5, 1234 Street, City',
+//     description: 'The First Meetup!',
+//   },
+//   {
+//     id: 'm2',
+//     title: 'A Second Meetup',
+//     image:
+//       'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Stadtbild_M%C3%BCnchen.jpg/1280px-Stadtbild_M%C3%BCnchen.jpg',
+//     address: ' 6, 2222 Street, Sydney',
+//     description: 'The Second Meetup!',
+//   },
+//   {
+//     id: 'm3',
+//     title: 'A Third Meetup',
+//     image:
+//       'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Stadtbild_M%C3%BCnchen.jpg/1280px-Stadtbild_M%C3%BCnchen.jpg',
+//     address: ' 7, 3333 Street, Mel',
+//     description: 'The Third Meetup!',
+//   },
+// ];
 
 function HomePage(props) {
   // No longer need useState and useEffect, using getStaticProps to get data.
@@ -42,10 +44,28 @@ function HomePage(props) {
 }
 
 export async function getStaticProps() {
+  console.log(123, '----------------getStaticProps');
   // fetch data from API
+  const client = await MongoClient.connect(
+    'mongodb+srv://110:110@cluster0.vkvphjv.mongodb.net/meetups?retryWrites=true&w=majority'
+  ); // establish connection
+
+  const db = client.db(); // to get hold of that database which we connect here.
+
+  const meetupsCollection = db.collection('meetups'); // get access to the collection (meetups)
+
+  const meetups = await meetupsCollection.find().toArray(); // will default find all documents in the meetupsCollection
+  console.log(meetups);
+
+  client.close();
   return {
     props: {
-      meetups: DUMMY_MEETUPS,
+      meetups: meetups.map(meetup => ({
+        title: meetup.title,
+        address: meetup.address,
+        image: meetup.image,
+        id: meetup._id.toString(),
+      })),
     },
     revalidate: 10, // seconds the server will wait for every generate.
   };
